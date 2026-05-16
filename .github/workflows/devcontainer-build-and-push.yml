@@ -1,0 +1,56 @@
+name: Dev Container Build and Push Image
+
+on:
+  workflow_call:
+    inputs:
+      registry:
+        description: Container registry to push the image to.
+        required: false
+        type: string
+        default: ghcr.io
+      image_name:
+        description: Image name without registry. Defaults to "<owner>/<repo>/devcontainer".
+        required: false
+        type: string
+        default: ""
+      sub_folder:
+        description: Folder that contains the .devcontainer directory.
+        required: false
+        type: string
+        default: .github
+      push:
+        description: Push behavior passed to devcontainers/ci.
+        required: false
+        type: string
+        default: always
+
+env:
+  REGISTRY: ${{ inputs.registry }}
+  IMAGE_NAME: ${{ inputs.image_name != '' && inputs.image_name || format('{0}/devcontainer', github.repository) }}
+      
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions: 
+      contents: read
+      packages: write
+
+    steps:
+    - 
+      name: Checkout
+      uses: actions/checkout@v4
+    -
+      name: Login to GitHub Container Registry
+      uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d
+      with:
+        registry: ${{ env.REGISTRY }}
+        username: ${{ github.actor }}
+        password: ${{ github.token }}
+    - 
+      name: Pre-build dev container image
+      uses: devcontainers/ci@v0.3
+      with:
+        subFolder: ${{ inputs.sub_folder }}
+        imageName: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        cacheFrom: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+        push: ${{ inputs.push }}
