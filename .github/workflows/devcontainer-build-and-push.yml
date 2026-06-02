@@ -46,6 +46,10 @@ jobs:
         registry: ${{ env.REGISTRY }}
         username: ${{ github.actor }}
         password: ${{ github.token }}
+    -
+      name: Normalize image name
+      shell: bash
+      run: echo "IMAGE_NAME=${IMAGE_NAME,,}" >> "$GITHUB_ENV"
     - 
       name: Pre-build dev container image
       uses: devcontainers/ci@v0.3
