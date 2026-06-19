@@ -23,6 +23,13 @@ on:
         required: false
         type: string
         default: always
+    secrets:
+      REGISTRY_USERNAME:
+        description: Container registry username. Falls back to github.actor only when registry is ghcr.io.
+        required: false
+      REGISTRY_PASSWORD:
+        description: Container registry password. Falls back to github.token only when registry is ghcr.io.
+        required: false
 
 env:
   REGISTRY: ${{ inputs.registry }}
@@ -40,12 +47,12 @@ jobs:
       name: Checkout
       uses: actions/checkout@v4
     -
-      name: Login to GitHub Container Registry
+      name: Login to Container Registry
       uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d
       with:
         registry: ${{ env.REGISTRY }}
-        username: ${{ github.actor }}
-        password: ${{ github.token }}
+        username: ${{ secrets.REGISTRY_USERNAME != '' && secrets.REGISTRY_USERNAME || (env.REGISTRY == 'ghcr.io' && github.actor || '') }}
+        password: ${{ secrets.REGISTRY_PASSWORD != '' && secrets.REGISTRY_PASSWORD || (env.REGISTRY == 'ghcr.io' && github.token || '') }}
     -
       name: Normalize image name
       shell: bash
