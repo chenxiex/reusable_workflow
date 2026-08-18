@@ -13,6 +13,9 @@ jobs:
     uses: chenxiex/reusable_workflow/.github/workflows/devcontainer-build-and-push.yml@main
     with:
       registry: ghcr.io
+      # Optional: devcontainer.json can read this with
+      # ${localEnv:DEVCONTAINER_BUILD_VARIANT:<default>}.
+      build_variant: debian13
     secrets:
       registry_username: ${{ secrets.REGISTRY_USERNAME }}
       registry_password: ${{ secrets.REGISTRY_PASSWORD }}

@@ -18,6 +18,11 @@ on:
         required: false
         type: string
         default: .github
+      build_variant:
+        description: Optional image variant exposed to devcontainer.json as DEVCONTAINER_BUILD_VARIANT.
+        required: false
+        type: string
+        default: ""
       push:
         description: Push behavior passed to devcontainers/ci.
         required: false
@@ -60,6 +65,8 @@ jobs:
     - 
       name: Pre-build dev container image
       uses: devcontainers/ci@v0.3
+      env:
+        DEVCONTAINER_BUILD_VARIANT: ${{ inputs.build_variant }}
       with:
         subFolder: ${{ inputs.sub_folder }}
         imageName: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
